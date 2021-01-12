@@ -13,18 +13,20 @@ class Bird:
         self.bird_sp = pg.sprite.Group()
 
         self.bird = pg.sprite.Sprite()
-        self.bird.image = load_image("bird.png")
+        self.bird_img = load_image("bird.png")
+        self.bird.image = self.bird_img
         self.bird.rect = self.bird.image.get_rect()
-        # self.bird_mask = pg.mask.from_surface(self.bird)
         self.bird.rect.x = 300
         self.bird.rect.y = 300
 
         self.bird_jump = pg.sprite.Sprite()
-        self.bird_jump.image = load_image("bird_jump.png")
+        self.bird_jump_img = load_image("bird_jump.png")
+        self.bird_jump.image = self.bird_jump_img
         self.bird_jump.rect = self.bird_jump.image.get_rect()
-        # self.bird_jump_mask = pg.mask.from_surface(self.bird_jump)
         self.bird_jump.rect.x = 300
         self.bird_jump.rect.y = 300
+
+        self.rect = self.bird_img.get_rect()
 
         # Add sprite bird to group bird
         self.bird_d_sp.add(self.bird)
@@ -36,34 +38,48 @@ class Bird:
         self.bird_sp.add(self.bird)
         self.bird_sp.add(self.bird_jump)
 
-    def check_collide(self):
-        if not pg.sprite.collide_mask(self, pipe):
-            pass
-
     def move(self):
         if jump:
             self.bird.rect.y -= 40
             self.bird_jump.rect.y -= 40
+            bird_up.rect.y -= 40
+            bird_down.rect.y -= 40
+
         elif not jump:
             self.bird.rect.y += 5
             self.bird_jump.rect.y += 5
+            bird_up.rect.y += 5
+            bird_down.rect.y += 5
+
+    def check_collide(self):
+        global running
+
+        if (bird_up.rect.colliderect(pipe_up) or
+            bird_up.rect.colliderect(pipe_down) or
+            bird_down.rect.colliderect(pipe_up) or
+            bird_down.rect.colliderect(pipe_down)):
+            running = False
+        else:
+            self.move()
+            pipe.update_pipe()
 
 
 class Pipe:
+
     def __init__(self):
-        self.pipes_sp= pg.sprite.Group()
+        self.pipes_sp = pg.sprite.Group()
 
         self.pipe_up = pg.sprite.Sprite()
-        self.pipe_up.image = load_image("pipe_up.png")
+        self.pipe_up_img = load_image("pipe_up.png")
+        self.pipe_up.image = self.pipe_up_img
         self.pipe_up.rect = self.pipe_up.image.get_rect()
-        # self.pipe_up_mask = pg.mask.from_surface(self.pipe_up)
         self.pipe_up.rect.x = 700
         self.pipe_up.rect.y = 400
 
         self.pipe_down = pg.sprite.Sprite()
-        self.pipe_down.image = load_image("pipe_down.png")
+        self.pipe_down_img = load_image("pipe_down.png")
+        self.pipe_down.image = self.pipe_down_img
         self.pipe_down.rect = self.pipe_down.image.get_rect()
-        # self.pipe_down_mask = pg.mask.from_surface(self.pipe_down)
         self.pipe_down.rect.x = 700
         self.pipe_down.rect.y = 280 - 900
 
@@ -78,7 +94,45 @@ class Pipe:
         #         self.pipe_list.append([random.randint(150, 600)])
         self.pipe_up.rect.x -= 10
         self.pipe_down.rect.x -= 10
+        pipe_up.rect.x -= 10
+        pipe_down.rect.x -= 10
         # if self.pipe_up.rect.x <= -10:
+
+
+class BirdUp:
+    def __init__(self):
+        self.image = load_image("bird_jump.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = 300
+        self.rect.y = 300
+        # self.mask = pg.mask.from_surface(self.image)
+
+
+class BirdDown:
+    def __init__(self):
+        self.image = load_image("bird.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = 300
+        self.rect.y = 300
+        # self.mask = pg.mask.from_surface(self.image)
+
+
+class PipeUp:
+    def __init__(self):
+        self.image = load_image("pipe_up.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = 700
+        self.rect.y = 400
+        # self.mask = pg.mask.from_surface(self.image)
+
+
+class PipeDown:
+    def __init__(self):
+        self.image = load_image("pipe_down.png")
+        self.rect = self.image.get_rect()
+        self.rect.x = 700
+        self.rect.y = 280 - 900
+        # self.mask = pg.mask.from_surface(self.image)
 
 
 class BackGround:
@@ -133,6 +187,11 @@ if __name__ == '__main__':
     pipe = Pipe()
     bg = BackGround()
 
+    bird_up = BirdUp()
+    bird_down = BirdDown()
+    pipe_up = PipeUp()
+    pipe_down = PipeDown()
+
     FPS = 15
     clock = pg.time.Clock()
 
@@ -142,12 +201,11 @@ if __name__ == '__main__':
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
-            #Do jump
+            # Do jump
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 jump = True
 
-        bird.move()
-        pipe.update_pipe()
+        bird.check_collide()
 
         draw_sprites()
 
