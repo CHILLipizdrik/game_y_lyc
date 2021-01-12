@@ -6,54 +6,25 @@ import random
 import time
 
 
-class FlappyBird():
+class Bird:
     def __init__(self):
-        self.pipe_list = []
-
-        self.all_sprites = pg.sprite.Group()
-        self.pipes_sp= pg.sprite.Group()
         self.bird_d_sp = pg.sprite.Group()
         self.bird_j_sp = pg.sprite.Group()
         self.bird_sp = pg.sprite.Group()
 
-        self.bg = pg.sprite.Sprite()
-        self.bg.image = load_image("background.png")
-        self.bg.rect = self.bg.image.get_rect()
-
         self.bird = pg.sprite.Sprite()
         self.bird.image = load_image("bird.png")
         self.bird.rect = self.bird.image.get_rect()
+        # self.bird_mask = pg.mask.from_surface(self.bird)
         self.bird.rect.x = 300
         self.bird.rect.y = 300
 
         self.bird_jump = pg.sprite.Sprite()
         self.bird_jump.image = load_image("bird_jump.png")
         self.bird_jump.rect = self.bird_jump.image.get_rect()
+        # self.bird_jump_mask = pg.mask.from_surface(self.bird_jump)
         self.bird_jump.rect.x = 300
         self.bird_jump.rect.y = 300
-
-        self.pipe_up = pg.sprite.Sprite()
-        self.pipe_up.image = load_image("pipe_up.png")
-        self.pipe_up.rect = self.pipe_up.image.get_rect()
-        self.pipe_up.rect.x = 700
-        self.pipe_up.rect.y = 400
-
-        self.pipe_down = pg.sprite.Sprite()
-        self.pipe_down.image = load_image("pipe_down.png")
-        self.pipe_down.rect = self.pipe_down.image.get_rect()
-        self.pipe_down.rect.x = 700
-        self.pipe_down.rect.y = 280 - 900
-
-        # Add sprites to group all_sprites
-        self.all_sprites.add(self.bg)
-        # self.all_sprites.add(self.bird)
-        # self.all_sprites.add(self.bird_jump)
-        # self.all_sprites.add(self.pipe_up)
-        # self.all_sprites.add(self.pipe_down)
-
-        # Add sprites pipe to group pipe
-        self.pipes_sp.add(self.pipe_up)
-        self.pipes_sp.add(self.pipe_down)
 
         # Add sprite bird to group bird
         self.bird_d_sp.add(self.bird)
@@ -65,6 +36,41 @@ class FlappyBird():
         self.bird_sp.add(self.bird)
         self.bird_sp.add(self.bird_jump)
 
+    def check_collide(self):
+        if not pg.sprite.collide_mask(self, pipe):
+            pass
+
+    def move(self):
+        if jump:
+            self.bird.rect.y -= 40
+            self.bird_jump.rect.y -= 40
+        elif not jump:
+            self.bird.rect.y += 5
+            self.bird_jump.rect.y += 5
+
+
+class Pipe:
+    def __init__(self):
+        self.pipes_sp= pg.sprite.Group()
+
+        self.pipe_up = pg.sprite.Sprite()
+        self.pipe_up.image = load_image("pipe_up.png")
+        self.pipe_up.rect = self.pipe_up.image.get_rect()
+        # self.pipe_up_mask = pg.mask.from_surface(self.pipe_up)
+        self.pipe_up.rect.x = 700
+        self.pipe_up.rect.y = 400
+
+        self.pipe_down = pg.sprite.Sprite()
+        self.pipe_down.image = load_image("pipe_down.png")
+        self.pipe_down.rect = self.pipe_down.image.get_rect()
+        # self.pipe_down_mask = pg.mask.from_surface(self.pipe_down)
+        self.pipe_down.rect.x = 700
+        self.pipe_down.rect.y = 280 - 900
+
+        # Add sprites pipe to group pipe
+        self.pipes_sp.add(self.pipe_up)
+        self.pipes_sp.add(self.pipe_down)
+
     def update_pipe(self):
         # # Adding Y coord of pipes to list, max count of pipes = 20
         # if len(self.pipe_list) < 15:
@@ -75,6 +81,15 @@ class FlappyBird():
         # if self.pipe_up.rect.x <= -10:
 
 
+class BackGround:
+    def __init__(self):
+        self.background = pg.sprite.Group()
+
+        self.bg = pg.sprite.Sprite()
+        self.bg.image = load_image("background.png")
+        self.bg.rect = self.bg.image.get_rect()
+
+        self.background.add(self.bg)
 
 
 def load_image(name, colorkey=None):
@@ -95,11 +110,28 @@ def load_image(name, colorkey=None):
     return image
 
 
+def draw_sprites():
+    global jump
+
+    screen.fill((10, 10, 10))
+    bg.background.draw(screen)
+    pipe.pipes_sp.draw(screen)
+    if jump:
+        bird.bird_j_sp.draw(screen)
+        jump = False
+    else:
+        bird.bird_d_sp.draw(screen)
+    clock.tick(FPS)
+    pg.display.flip()
+
+
 if __name__ == '__main__':
     pg.init()
     size = width, height = 1024, 768
     screen = pg.display.set_mode(size)
-    fp = FlappyBird()
+    bird = Bird()
+    pipe = Pipe()
+    bg = BackGround()
 
     FPS = 15
     clock = pg.time.Clock()
@@ -113,26 +145,11 @@ if __name__ == '__main__':
             #Do jump
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 jump = True
-                fp.bird.rect.y -= 40
-                fp.bird_jump.rect.y -= 40
 
-        if not jump:
-            fp.bird.rect.y += 5
-            fp.bird_jump.rect.y += 5
+        bird.move()
+        pipe.update_pipe()
 
-
-        fp.update_pipe()
-
-        screen.fill((10, 10, 10))
-        fp.all_sprites.draw(screen)
-        fp.pipes_sp.draw(screen)
-        if jump:
-            fp.bird_j_sp.draw(screen)
-            jump = False
-        else:
-            fp.bird_d_sp.draw(screen)
-        clock.tick(FPS)
-        pg.display.flip()
+        draw_sprites()
 
     pg.quit()
 
