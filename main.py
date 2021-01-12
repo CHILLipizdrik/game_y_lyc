@@ -8,6 +8,7 @@ import time
 
 class Bird:
     def __init__(self):
+        self.dead = False
         self.bird_d_sp = pg.sprite.Group()
         self.bird_j_sp = pg.sprite.Group()
         self.bird_sp = pg.sprite.Group()
@@ -51,6 +52,14 @@ class Bird:
             bird_up.rect.y += 5
             bird_down.rect.y += 5
 
+    def die(self):
+        self.bird.rect.y += 15
+        self.bird_jump.rect.y += 15
+        bird_up.rect.y += 15
+        bird_down.rect.y += 15
+        if self.bird.rect.y >= 775:
+            quit()
+
     def check_collide(self):
         global running
 
@@ -58,10 +67,11 @@ class Bird:
             bird_up.rect.colliderect(pipe_down) or
             bird_down.rect.colliderect(pipe_up) or
             bird_down.rect.colliderect(pipe_down)):
-            running = False
+            self.dead = True
         else:
-            self.move()
-            pipe.update_pipe()
+            if not self.dead:
+                self.move()
+                pipe.update_pipe()
 
 
 class Pipe:
@@ -105,7 +115,6 @@ class BirdUp:
         self.rect = self.image.get_rect()
         self.rect.x = 300
         self.rect.y = 300
-        # self.mask = pg.mask.from_surface(self.image)
 
 
 class BirdDown:
@@ -114,7 +123,6 @@ class BirdDown:
         self.rect = self.image.get_rect()
         self.rect.x = 300
         self.rect.y = 300
-        # self.mask = pg.mask.from_surface(self.image)
 
 
 class PipeUp:
@@ -123,7 +131,6 @@ class PipeUp:
         self.rect = self.image.get_rect()
         self.rect.x = 700
         self.rect.y = 400
-        # self.mask = pg.mask.from_surface(self.image)
 
 
 class PipeDown:
@@ -132,7 +139,6 @@ class PipeDown:
         self.rect = self.image.get_rect()
         self.rect.x = 700
         self.rect.y = 280 - 900
-        # self.mask = pg.mask.from_surface(self.image)
 
 
 class BackGround:
@@ -175,7 +181,6 @@ def draw_sprites():
         jump = False
     else:
         bird.bird_d_sp.draw(screen)
-    clock.tick(FPS)
     pg.display.flip()
 
 
@@ -203,11 +208,15 @@ if __name__ == '__main__':
                 running = False
             # Do jump
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                jump = True
+                if not bird.dead:
+                    jump = True
 
         bird.check_collide()
+        if bird.dead:
+            bird.die()
 
         draw_sprites()
+        clock.tick(FPS)
 
     pg.quit()
 
