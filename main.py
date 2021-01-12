@@ -77,36 +77,49 @@ class Bird:
 class Pipe:
 
     def __init__(self):
+        self.x = 700
+        self.pipes_list = []
         self.pipes_sp = pg.sprite.Group()
 
+        for p in self.pipes_list:
+            x, y = p
+            self.add_pipes(x, y)
+
+    def add_pipes(self, x, dl_y):
         self.pipe_up = pg.sprite.Sprite()
         self.pipe_up_img = load_image("pipe_up.png")
         self.pipe_up.image = self.pipe_up_img
         self.pipe_up.rect = self.pipe_up.image.get_rect()
-        self.pipe_up.rect.x = 700
-        self.pipe_up.rect.y = 400
+        self.pipe_up.rect.x = x
+        self.pipe_up.rect.y = dl_y
 
         self.pipe_down = pg.sprite.Sprite()
         self.pipe_down_img = load_image("pipe_down.png")
         self.pipe_down.image = self.pipe_down_img
         self.pipe_down.rect = self.pipe_down.image.get_rect()
-        self.pipe_down.rect.x = 700
-        self.pipe_down.rect.y = 280 - 900
+        self.pipe_down.rect.x = x
+        self.pipe_down.rect.y = dl_y - 120 - 900
 
         # Add sprites pipe to group pipe
         self.pipes_sp.add(self.pipe_up)
         self.pipes_sp.add(self.pipe_down)
 
+    def create_pipes(self):
+        # Adding Y coord of pipes to list, max count of pipes = 20
+
+        if len(self.pipes_list) < 15:
+            while len(self.pipes_list) < 20:
+                self.pipes_list.append([self.x, random.randint(300, 600)])
+                self.x += 100
+
     def update_pipe(self):
-        # # Adding Y coord of pipes to list, max count of pipes = 20
-        # if len(self.pipe_list) < 15:
-        #     while len(self.pipe_list) < 20:
-        #         self.pipe_list.append([random.randint(150, 600)])
+
         self.pipe_up.rect.x -= 10
         self.pipe_down.rect.x -= 10
         pipe_up.rect.x -= 10
         pipe_down.rect.x -= 10
-        # if self.pipe_up.rect.x <= -10:
+        if self.pipe_up.rect.x <= -10:
+            self.pipes_list.remove(self.pipes_list[0])
 
 
 class BirdUp:
@@ -188,20 +201,23 @@ if __name__ == '__main__':
     pg.init()
     size = width, height = 1024, 768
     screen = pg.display.set_mode(size)
+
     bird = Bird()
     pipe = Pipe()
     bg = BackGround()
-
     bird_up = BirdUp()
     bird_down = BirdDown()
     pipe_up = PipeUp()
     pipe_down = PipeDown()
+
+    pipe.create_pipes()
 
     FPS = 15
     clock = pg.time.Clock()
 
     running = True
     while running:
+        pipe.create_pipes()
         jump = False
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -212,6 +228,7 @@ if __name__ == '__main__':
                     jump = True
 
         bird.check_collide()
+
         if bird.dead:
             bird.die()
 
