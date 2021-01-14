@@ -9,6 +9,8 @@ import time
 class Bird:
     def __init__(self):
         self.dead = False
+        self.jump = 8
+        self.fall = 2
         self.bird_d_sp = pg.sprite.Group()
         self.bird_j_sp = pg.sprite.Group()
         self.bird_sp = pg.sprite.Group()
@@ -41,16 +43,16 @@ class Bird:
 
     def move(self):
         if jump:
-            self.bird.rect.y -= 40
-            self.bird_jump.rect.y -= 40
-            bird_up.rect.y -= 40
-            bird_down.rect.y -= 40
+            self.bird.rect.y -= self.jump
+            self.bird_jump.rect.y -= self.jump
+            bird_up.rect.y -= self.jump
+            bird_down.rect.y -= self.jump
 
         elif not jump:
-            self.bird.rect.y += 5
-            self.bird_jump.rect.y += 5
-            bird_up.rect.y += 5
-            bird_down.rect.y += 5
+            self.bird.rect.y += self.fall
+            self.bird_jump.rect.y += self.fall
+            bird_up.rect.y += self.fall
+            bird_down.rect.y += self.fall
 
     def die(self):
         self.bird.rect.y += 15
@@ -63,25 +65,39 @@ class Bird:
     def check_collide(self):
         global running
 
-        if (bird_up.rect.colliderect(pipe_up) or
-            bird_up.rect.colliderect(pipe_down) or
-            bird_down.rect.colliderect(pipe_up) or
-            bird_down.rect.colliderect(pipe_down)):
-            self.dead = True
-        else:
-            if not self.dead:
-                self.move()
-                pipe.update_pipe()
+        for pipes_col in pipe.pipes_list_col:
+            pipe_up_col, pipe_down_col = pipes_col
+            if (bird_up.rect.colliderect(pipe_up_col) or
+                bird_up.rect.colliderect(pipe_down_col) or
+                bird_down.rect.colliderect(pipe_up_col) or
+                bird_down.rect.colliderect(pipe_down_col)):
+                self.dead = True
+            else:
+                if not self.dead:
+                    self.move()
+                    pipe.update_pipe()
 
 
 class Pipe:
 
     def __init__(self):
-        self.x = 700
+        self.x = 1000
+        self.pipes_list_y_cord = []
         self.pipes_list = []
+        self.pipes_list_col = []
         self.pipes_sp = pg.sprite.Group()
+        self.create_pipes_coords()
 
-        for p in self.pipes_list:
+    def create_pipes_coords(self):
+        # Adding Y coord of pipes to list, max count of pipes = 20
+
+        for _ in range(10):
+            self.pipes_list_y_cord.append([self.x, random.randint(300, 600)])
+            self.x += 240
+        self.create_pipes()
+
+    def create_pipes(self):
+        for p in self.pipes_list_y_cord:
             x, y = p
             self.add_pipes(x, y)
 
@@ -98,28 +114,33 @@ class Pipe:
         self.pipe_down.image = self.pipe_down_img
         self.pipe_down.rect = self.pipe_down.image.get_rect()
         self.pipe_down.rect.x = x
-        self.pipe_down.rect.y = dl_y - 120 - 900
+        self.pipe_down.rect.y = dl_y - 200 - 900
 
         # Add sprites pipe to group pipe
         self.pipes_sp.add(self.pipe_up)
         self.pipes_sp.add(self.pipe_down)
+        self.pipes_list.append([self.pipe_up, self.pipe_down])
 
-    def create_pipes(self):
-        # Adding Y coord of pipes to list, max count of pipes = 20
-
-        if len(self.pipes_list) < 15:
-            while len(self.pipes_list) < 20:
-                self.pipes_list.append([self.x, random.randint(300, 600)])
-                self.x += 100
+        self.pipes_list_col.append([PipeUp(x, dl_y), PipeDown(x, dl_y)])
 
     def update_pipe(self):
+        for pipes in self.pipes_list:
+            pipe_up, pipe_down = pipes
 
-        self.pipe_up.rect.x -= 10
-        self.pipe_down.rect.x -= 10
-        pipe_up.rect.x -= 10
-        pipe_down.rect.x -= 10
-        if self.pipe_up.rect.x <= -10:
-            self.pipes_list.remove(self.pipes_list[0])
+            pipe_up.rect.x -= 2
+            pipe_down.rect.x -= 2
+
+            for pipes_col in self.pipes_list_col:
+                pipe_up_col, pipe_down_col = pipes_col
+
+                pipe_up_col.rect.x -= 2
+                pipe_down_col.rect.x -= 2
+                break
+
+        # if self.pipe_up.rect.x <= -10:
+        #     self.pipes_list_y_cord.remove(self.pipes_list_y_cord[0])
+        #     self.pipes_list.remove(self.pipes_list[0])
+        #     self.pipes_list_col.remove(self.pipes_list_col[0])
 
 
 class BirdUp:
@@ -139,19 +160,19 @@ class BirdDown:
 
 
 class PipeUp:
-    def __init__(self):
+    def __init__(self, x, y):
         self.image = load_image("pipe_up.png")
         self.rect = self.image.get_rect()
-        self.rect.x = 700
-        self.rect.y = 400
+        self.rect.x = x
+        self.rect.y = y
 
 
 class PipeDown:
-    def __init__(self):
+    def __init__(self, x, y):
         self.image = load_image("pipe_down.png")
         self.rect = self.image.get_rect()
-        self.rect.x = 700
-        self.rect.y = 280 - 900
+        self.rect.x = x
+        self.rect.y = y - 200 - 900
 
 
 class BackGround:
@@ -186,7 +207,7 @@ def load_image(name, colorkey=None):
 def draw_sprites():
     global jump
 
-    screen.fill((10, 10, 10))
+    screen.fill((0, 0, 0))
     bg.background.draw(screen)
     pipe.pipes_sp.draw(screen)
     if jump:
@@ -207,17 +228,12 @@ if __name__ == '__main__':
     bg = BackGround()
     bird_up = BirdUp()
     bird_down = BirdDown()
-    pipe_up = PipeUp()
-    pipe_down = PipeDown()
-
-    pipe.create_pipes()
 
     FPS = 15
     clock = pg.time.Clock()
 
     running = True
     while running:
-        pipe.create_pipes()
         jump = False
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -237,10 +253,7 @@ if __name__ == '__main__':
 
     pg.quit()
 
-    """
-    Add class Pipe what will create all pipes, spawn with pass at random height, pass = 120 and distance = 120 
-    and move maybe
-    Also add collisions and sprite bird_dead
-    Add score with db
-    Add money and shop
-    """
+    """Add class Pipe what will create all pipes, spawn with pass at random 
+    height, pass = 120 and distance = 120 and move maybe 
+    Also add collisions and sprite bird_dead Add score with db 
+    Add money and shop and skins"""
