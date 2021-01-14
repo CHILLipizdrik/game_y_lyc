@@ -71,6 +71,7 @@ class Bird:
                 bird_up.rect.colliderect(pipe_down_col) or
                 bird_down.rect.colliderect(pipe_up_col) or
                 bird_down.rect.colliderect(pipe_down_col)):
+                print(1)
                 self.dead = True
             else:
                 if not self.dead:
@@ -91,7 +92,7 @@ class Pipe:
     def create_pipes_coords(self):
         # Adding Y coord of pipes to list, max count of pipes = 20
 
-        for _ in range(10):
+        for _ in range(5):
             self.pipes_list_y_cord.append([self.x, random.randint(300, 600)])
             self.x += 240
         self.create_pipes()
@@ -121,7 +122,9 @@ class Pipe:
         self.pipes_sp.add(self.pipe_down)
         self.pipes_list.append([self.pipe_up, self.pipe_down])
 
-        self.pipes_list_col.append([PipeUp(x, dl_y), PipeDown(x, dl_y)])
+        self.pipe_up_col = PipeUp(x, dl_y)
+        self.pipe_down_col = PipeDown(x, dl_y)
+        self.pipes_list_col.append([self.pipe_up_col, self.pipe_down_col])
 
     def update_pipe(self):
         for pipes in self.pipes_list:
@@ -130,12 +133,11 @@ class Pipe:
             pipe_up.rect.x -= 2
             pipe_down.rect.x -= 2
 
-            for pipes_col in self.pipes_list_col:
-                pipe_up_col, pipe_down_col = pipes_col
+        for pipes_col in self.pipes_list_col:
+            pipe_up_col, pipe_down_col = pipes_col
 
-                pipe_up_col.rect.x -= 2
-                pipe_down_col.rect.x -= 2
-                break
+            pipe_up_col.rect.x -= 2
+            pipe_down_col.rect.x -= 2
 
         # if self.pipe_up.rect.x <= -10:
         #     self.pipes_list_y_cord.remove(self.pipes_list_y_cord[0])
