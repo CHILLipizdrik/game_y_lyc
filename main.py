@@ -9,7 +9,7 @@ import time
 class Bird:
     def __init__(self):
         self.dead = False
-        self.jump = 8
+        self.jump = 10
         self.fall = 2
         self.bird_d_sp = pg.sprite.Group()
         self.bird_j_sp = pg.sprite.Group()
@@ -71,7 +71,7 @@ class Bird:
                 bird_up.rect.colliderect(pipe_down_col) or
                 bird_down.rect.colliderect(pipe_up_col) or
                 bird_down.rect.colliderect(pipe_down_col)):
-                print(1)
+                # print(1)
                 self.dead = True
             else:
                 if not self.dead:
@@ -80,10 +80,10 @@ class Bird:
 
 
 class Pipe:
-
     def __init__(self):
-        self.x = 1000
-        self.pipes_list_y_cord = []
+        self.x = 1030
+        self.pipe_speed = 2
+        # self.pipes_list_y_cord = []
         self.pipes_list = []
         self.pipes_list_col = []
         self.pipes_sp = pg.sprite.Group()
@@ -91,16 +91,19 @@ class Pipe:
 
     def create_pipes_coords(self):
         # Adding Y coord of pipes to list, max count of pipes = 20
+        x = 544
 
         for _ in range(5):
-            self.pipes_list_y_cord.append([self.x, random.randint(300, 600)])
-            self.x += 240
-        self.create_pipes()
-
-    def create_pipes(self):
-        for p in self.pipes_list_y_cord:
-            x, y = p
+            # self.pipes_list_y_cord.append([self.x, random.randint(300, 600)])
+            x, y = x, random.randint(300, 600)
+            x += 240
+            # self.create_pipes()
             self.add_pipes(x, y)
+
+    # def create_pipes(self):
+    #     for p in self.pipes_list_y_cord:
+    #         x, y = p
+    #         self.add_pipes(x, y)
 
     def add_pipes(self, x, dl_y):
         self.pipe_up = pg.sprite.Sprite()
@@ -130,19 +133,25 @@ class Pipe:
         for pipes in self.pipes_list:
             pipe_up, pipe_down = pipes
 
-            pipe_up.rect.x -= 2
-            pipe_down.rect.x -= 2
+            pipe_up.rect.x -= self.pipe_speed
+            pipe_down.rect.x -= self.pipe_speed
 
         for pipes_col in self.pipes_list_col:
             pipe_up_col, pipe_down_col = pipes_col
 
-            pipe_up_col.rect.x -= 2
-            pipe_down_col.rect.x -= 2
+            pipe_up_col.rect.x -= self.pipe_speed
+            pipe_down_col.rect.x -= self.pipe_speed
 
-        # if self.pipe_up.rect.x <= -10:
-        #     self.pipes_list_y_cord.remove(self.pipes_list_y_cord[0])
-        #     self.pipes_list.remove(self.pipes_list[0])
-        #     self.pipes_list_col.remove(self.pipes_list_col[0])
+
+        for pipe in self.pipes_list:
+            pipe_up, pipe_down = pipe
+            if pipe_up.rect.x <= -176:
+                # self.pipes_list_y_cord.pop(0)
+                self.pipes_list.pop(0)
+                self.pipes_list_col.pop(0)
+                self.pipes_sp.remove(pipe_up)
+                self.pipes_sp.remove(pipe_down)
+                self.add_pipes(self.x, random.randint(300, 600))
 
 
 class BirdUp:
