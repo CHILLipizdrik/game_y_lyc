@@ -71,7 +71,6 @@ class Bird:
                 bird_up.rect.colliderect(pipe_down_col) or
                 bird_down.rect.colliderect(pipe_up_col) or
                 bird_down.rect.colliderect(pipe_down_col)):
-                # print(1)
                 self.dead = True
             else:
                 if not self.dead:
@@ -83,6 +82,7 @@ class Pipe:
     def __init__(self):
         self.x = 1030
         self.pipe_speed = 2
+        self.score = 0
         # self.pipes_list_y_cord = []
         self.pipes_list = []
         self.pipes_list_col = []
@@ -152,6 +152,12 @@ class Pipe:
                 self.pipes_sp.remove(pipe_up)
                 self.pipes_sp.remove(pipe_down)
                 self.add_pipes(self.x, random.randint(300, 600))
+            if pipe_up.rect.x == 300:
+                self.get_score()
+
+    def get_score(self):
+        self.score += 1
+        print(self.score)
 
 
 class BirdUp:
@@ -215,7 +221,13 @@ def load_image(name, colorkey=None):
     return image
 
 
-def draw_sprites():
+def print_score(score):
+    font = pg.font.Font(None, 86)
+    text = font.render(str(score), True, (252, 200, 96))
+    screen.blit(text, (512, 78))
+
+
+def draw_sprites(score):
     global jump
 
     screen.fill((0, 0, 0))
@@ -226,12 +238,13 @@ def draw_sprites():
         jump = False
     else:
         bird.bird_d_sp.draw(screen)
+    print_score(score)
     pg.display.flip()
 
 
 if __name__ == '__main__':
     pg.init()
-    size = width, height = 1024, 768
+    size = width, height = 1024, 780
     screen = pg.display.set_mode(size)
 
     bird = Bird()
@@ -259,7 +272,7 @@ if __name__ == '__main__':
         if bird.dead:
             bird.die()
 
-        draw_sprites()
+        draw_sprites(pipe.score)
         clock.tick(FPS)
 
     pg.quit()
