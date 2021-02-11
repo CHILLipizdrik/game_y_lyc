@@ -63,8 +63,6 @@ class Bird:
             quit()
 
     def check_collide(self):
-        global running
-
         for pipes_col in pipe.pipes_list_col:
             pipe_up_col, pipe_down_col = pipes_col
             if (bird_up.rect.colliderect(pipe_up_col) or
@@ -236,71 +234,124 @@ def terminate():
     sys.exit()
 
 
-def main_menu():
-    bg = pg.transform.scale(load_image('background.png'), (width, height))
-    screen.blit(bg, (0, 0))
-    font = pg.font.Font(None, 100)
-    section_start_game = "START GAME"
-    section_records = "RECORDS"
-    section_shop = "SHOP"
-    section_exit = "EXIT"
-    sections = [section_start_game, section_records, section_shop, section_exit]
-    sections_coords = {
-        section_start_game: (90, 169, 559, 248),
-        section_records: (90, 259, 449, 338),
-        section_shop: (90, 349, 310, 428),
-        section_exit: (90, 439, 279, 518)
-    }
+class MainMenu:
+    def __init__(self):
+        self.bg_main = pg.transform.scale(load_image('background.png'), (width, height))
+        self.font_normal = pg.font.Font(None, 100)
+        self.font_chosen = pg.font.Font(None, 120)
+        self.color_normal = (252, 200, 96)
+        self.color_chosen = (255, 0, 0)
+        self.section_start_game = "START GAME"
+        self.section_records = "RECORDS"
+        self.section_shop = "SHOP"
+        self.section_exit = "EXIT"
+        self.sections = [[self.section_start_game, False], [self.section_records, False], [self.section_shop, False],
+                         [self.section_exit, False]]
+        self.sections_coords = {
+            self.section_start_game: (90, 169, 559, 248),
+            self.section_records: (90, 259, 449, 338),
+            self.section_shop: (90, 349, 310, 428),
+            self.section_exit: (90, 439, 279, 518)}
 
-    text_coord = 160
-    text_rect_coord = 10
-    for section in sections:
-        text = font.render(section, True, (252, 200, 96))
-        intro_rect = text.get_rect()
+        self.text_coord = [
+            [90, 169, 449, 69],
+            [90, 269, 339, 69],
+            [90, 369, 200, 69],
+            [90, 469, 169, 69]]
 
-        text_coord += 20
-        text_rect_coord += 90
-        intro_rect.top = text_coord
-        intro_rect.x = 100
-        text_coord += intro_rect.height
+        self.rect_coord = [
+            [80, 159, 469, 79],
+            [80, 259, 359, 79],
+            [80, 359, 220, 79],
+            [80, 459, 189, 79]]
 
-        text_x = 90
-        text_y = text.get_height() + text_rect_coord
-        text_w = text.get_width() + 20
-        text_h = text.get_height() + 10
+        self.rect_coord_chosen = [
+            [80, 159, 561, 92],
+            [80, 259, 430, 92],
+            [80, 359, 263, 92],
+            [80, 459, 224, 92]]
 
+        self.ssg = self.sections_coords[self.section_start_game]
+        self.sr = self.sections_coords[self.section_records]
+        self.ss = self.sections_coords[self.section_shop]
+        self.se = self.sections_coords[self.section_exit]
 
-        screen.blit(text, intro_rect)
-        pg.draw.rect(screen, (252, 200, 96), (text_x, text_y, text_w, text_h), 3)
+    def main_menu(self):
+        screen.blit(self.bg_main, (0, 0))
+        for i in range(4):
+            section = self.sections[i]
+            if section[1]:
+                color = self.color_chosen
+                font = self.font_chosen
+                text = font.render(section[0], True, color)
+                rect_coord = self.rect_coord_chosen[i]
+            else:
+                color = self.color_normal
+                font = self.font_normal
+                text = font.render(section[0], True, color)
+                rect_coord = self.rect_coord[i]
 
-    ssg = sections_coords[section_start_game]
-    sr = sections_coords[section_records]
-    ss = sections_coords[section_shop]
-    se = sections_coords[section_exit]
-    while True:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                terminate()
+            screen.blit(text, self.text_coord[i])
+            pg.draw.rect(screen, color, rect_coord, 3)
 
-            if event.type == pg.MOUSEBUTTONDOWN:
-                # section start game
-                if (ssg[0] < event.pos[0] < ssg[2]) and (ssg[1] < event.pos[1] < ssg[3]) and event.button == 1:
-                    return True
+    def choose_section(self):
+        while True:
 
-                # section records
-                elif (sr[0] < event.pos[0] < sr[2]) and (sr[1] < event.pos[1] < sr[3]) and event.button == 1:
-                    pass
-
-                # section shop
-                elif (ss[0] < event.pos[0] < ss[2]) and (ss[1] < event.pos[1] < ss[3]) and event.button == 1:
-                    pass
-
-                # section exit
-                elif (se[0] < event.pos[0] < se[2]) and (se[1] < event.pos[1] < se[3]) and event.button == 1:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
                     terminate()
+                if event.type == pg.MOUSEMOTION:
+                    # section start game
+                    if (self.ssg[0] < event.pos[0] < self.ssg[2]) and (self.ssg[1] < event.pos[1] < self.ssg[3]):
+                        self.clear_selection()
+                        self.sections[0][1] = True
+                        self.main_menu()
 
-        pg.display.flip()
-        clock.tick(FPS)
+                    # section records
+                    elif (self.sr[0] < event.pos[0] < self.sr[2]) and (self.sr[1] < event.pos[1] < self.sr[3]):
+                        self.clear_selection()
+                        self.sections[1][1] = True
+                        self.main_menu()
+
+                    # section shop
+                    elif (self.ss[0] < event.pos[0] < self.ss[2]) and (self.ss[1] < event.pos[1] < self.ss[3]):
+                        self.clear_selection()
+                        self.sections[2][1] = True
+                        self.main_menu()
+
+                    # section exit
+                    elif (self.se[0] < event.pos[0] < self.se[2]) and (self.se[1] < event.pos[1] < self.se[3]):
+                        self.clear_selection()
+                        self.sections[3][1] = True
+                        self.main_menu()
+                    else:
+                        self.clear_selection()
+                        self.main_menu()
+
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    # section start game
+                    if (self.ssg[0] < event.pos[0] < self.ssg[2]) and (self.ssg[1] < event.pos[1] < self.ssg[3]) \
+                        and event.button == 1:
+                        return 1
+                    # section records
+                    elif (self.sr[0] < event.pos[0] < self.sr[2]) and (self.sr[1] < event.pos[1] < self.sr[3]) \
+                        and event.button == 1:
+                        return 2
+                    # section shop
+                    elif (self.ss[0] < event.pos[0] < self.ss[2]) and (self.ss[1] < event.pos[1] < self.ss[3]) \
+                        and event.button == 1:
+                        return 3
+                    # section exit
+                    elif (self.se[0] < event.pos[0] < self.se[2]) and (self.se[1] < event.pos[1] < self.se[3]) \
+                        and event.button == 1:
+                        terminate()
+
+            pg.display.flip()
+            clock.tick(FPS)
+
+    def clear_selection(self):
+        for i in range(4):
+            self.sections[i][1] = False
 
 
 def game(running):
@@ -332,15 +383,26 @@ if __name__ == '__main__':
 
     FPS = 15
     clock = pg.time.Clock()
+    jump = False
 
     bird = Bird()
     pipe = Pipe()
     bg = BackGround()
     bird_up = BirdUp()
     bird_down = BirdDown()
+    main_menu = MainMenu()
 
-    jump = False
+    section = main_menu.choose_section()
 
-    game(main_menu())
+    if section == 1:
+        game(True)
+
+    elif section == 2:
+        game(True)
+        pass
+
+    elif section == 3:
+        game(True)
+        pass
 
     pg.quit()
