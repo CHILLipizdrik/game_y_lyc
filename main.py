@@ -83,7 +83,6 @@ class Pipe:
         self.x = 1030
         self.pipe_speed = 2
         self.score = 0
-        # self.pipes_list_y_cord = []
         self.pipes_list = []
         self.pipes_list_col = []
         self.pipes_sp = pg.sprite.Group()
@@ -94,16 +93,9 @@ class Pipe:
         x = 544
 
         for _ in range(5):
-            # self.pipes_list_y_cord.append([self.x, random.randint(300, 600)])
             x, y = x, random.randint(300, 600)
             x += 240
-            # self.create_pipes()
             self.add_pipes(x, y)
-
-    # def create_pipes(self):
-    #     for p in self.pipes_list_y_cord:
-    #         x, y = p
-    #         self.add_pipes(x, y)
 
     def add_pipes(self, x, dl_y):
         self.pipe_up = pg.sprite.Sprite()
@@ -146,7 +138,6 @@ class Pipe:
         for pipe in self.pipes_list:
             pipe_up, pipe_down = pipe
             if pipe_up.rect.x <= -176:
-                # self.pipes_list_y_cord.pop(0)
                 self.pipes_list.pop(0)
                 self.pipes_list_col.pop(0)
                 self.pipes_sp.remove(pipe_up)
@@ -157,7 +148,6 @@ class Pipe:
 
     def get_score(self):
         self.score += 1
-        print(self.score)
 
 
 class BirdUp:
@@ -205,7 +195,6 @@ class BackGround:
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
-    # если файл не существует, то выходим
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
@@ -242,21 +231,81 @@ def draw_sprites(score):
     pg.display.flip()
 
 
-if __name__ == '__main__':
-    pg.init()
-    size = width, height = 1024, 780
-    screen = pg.display.set_mode(size)
+def terminate():
+    pg.quit()
+    sys.exit()
 
-    bird = Bird()
-    pipe = Pipe()
-    bg = BackGround()
-    bird_up = BirdUp()
-    bird_down = BirdDown()
 
-    FPS = 15
-    clock = pg.time.Clock()
+def main_menu():
+    bg = pg.transform.scale(load_image('background.png'), (width, height))
+    screen.blit(bg, (0, 0))
+    font = pg.font.Font(None, 100)
+    section_start_game = "START GAME"
+    section_records = "RECORDS"
+    section_shop = "SHOP"
+    section_exit = "EXIT"
+    sections = [section_start_game, section_records, section_shop, section_exit]
+    sections_coords = {
+        section_start_game: (90, 169, 559, 248),
+        section_records: (90, 259, 449, 338),
+        section_shop: (90, 349, 310, 428),
+        section_exit: (90, 439, 279, 518)
+    }
 
-    running = True
+    text_coord = 160
+    text_rect_coord = 10
+    for section in sections:
+        text = font.render(section, True, (252, 200, 96))
+        intro_rect = text.get_rect()
+
+        text_coord += 20
+        text_rect_coord += 90
+        intro_rect.top = text_coord
+        intro_rect.x = 100
+        text_coord += intro_rect.height
+
+        text_x = 90
+        text_y = text.get_height() + text_rect_coord
+        text_w = text.get_width() + 20
+        text_h = text.get_height() + 10
+
+
+        screen.blit(text, intro_rect)
+        pg.draw.rect(screen, (252, 200, 96), (text_x, text_y, text_w, text_h), 3)
+
+    ssg = sections_coords[section_start_game]
+    sr = sections_coords[section_records]
+    ss = sections_coords[section_shop]
+    se = sections_coords[section_exit]
+    while True:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                terminate()
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+                # section start game
+                if (ssg[0] < event.pos[0] < ssg[2]) and (ssg[1] < event.pos[1] < ssg[3]) and event.button == 1:
+                    return True
+
+                # section records
+                elif (sr[0] < event.pos[0] < sr[2]) and (sr[1] < event.pos[1] < sr[3]) and event.button == 1:
+                    pass
+
+                # section shop
+                elif (ss[0] < event.pos[0] < ss[2]) and (ss[1] < event.pos[1] < ss[3]) and event.button == 1:
+                    pass
+
+                # section exit
+                elif (se[0] < event.pos[0] < se[2]) and (se[1] < event.pos[1] < se[3]) and event.button == 1:
+                    terminate()
+
+        pg.display.flip()
+        clock.tick(FPS)
+
+
+def game(running):
+    global jump
+
     while running:
         jump = False
         for event in pg.event.get():
@@ -275,9 +324,23 @@ if __name__ == '__main__':
         draw_sprites(pipe.score)
         clock.tick(FPS)
 
-    pg.quit()
 
-    """Add class Pipe what will create all pipes, spawn with pass at random 
-    height, pass = 120 and distance = 120 and move maybe 
-    Also add collisions and sprite bird_dead Add score with db 
-    Add money and shop and skins"""
+if __name__ == '__main__':
+    pg.init()
+    size = width, height = 1024, 780
+    screen = pg.display.set_mode(size)
+
+    FPS = 15
+    clock = pg.time.Clock()
+
+    bird = Bird()
+    pipe = Pipe()
+    bg = BackGround()
+    bird_up = BirdUp()
+    bird_down = BirdDown()
+
+    jump = False
+
+    game(main_menu())
+
+    pg.quit()
