@@ -243,42 +243,48 @@ class MainMenu:
         self.color_chosen = (255, 0, 0)
         self.section_start_game = "START GAME"
         self.section_records = "RECORDS"
+        self.section_stats = "STATS"
         self.section_shop = "SHOP"
         self.section_exit = "EXIT"
-        self.sections = [[self.section_start_game, False], [self.section_records, False], [self.section_shop, False],
-                         [self.section_exit, False]]
+        self.sections = [[self.section_start_game, False], [self.section_records, False], [self.section_stats, False],
+                         [self.section_shop, False], [self.section_exit, False]]
         self.sections_coords = {
-            self.section_start_game: (90, 169, 559, 248),
-            self.section_records: (90, 259, 449, 338),
-            self.section_shop: (90, 349, 310, 428),
-            self.section_exit: (90, 439, 279, 518)}
+            self.section_start_game: (80, 119, 549, 198),
+            self.section_records: (80, 219, 439, 298),
+            self.section_stats: (80, 319, 311, 398),
+            self.section_shop: (80, 419, 300, 498),
+            self.section_exit: (80, 519, 269, 598)}
 
         self.text_coord = [
-            [90, 169, 449, 69],
-            [90, 269, 339, 69],
-            [90, 369, 200, 69],
-            [90, 469, 169, 69]]
+            [90, 129, 449, 69],
+            [90, 229, 339, 69],
+            [90, 329, 211, 69],
+            [90, 429, 200, 69],
+            [90, 529, 169, 69]]
 
         self.rect_coord = [
-            [80, 159, 469, 79],
-            [80, 259, 359, 79],
-            [80, 359, 220, 79],
-            [80, 459, 189, 79]]
+            [80, 119, 469, 79],
+            [80, 219, 359, 79],
+            [80, 319, 231, 79],
+            [80, 419, 220, 79],
+            [80, 519, 189, 79]]
 
         self.rect_coord_chosen = [
-            [80, 159, 561, 92],
-            [80, 259, 430, 92],
-            [80, 359, 263, 92],
-            [80, 459, 224, 92]]
+            [80, 119, 561, 92],
+            [80, 219, 430, 92],
+            [80, 319, 276, 92],
+            [80, 419, 263, 92],
+            [80, 519, 224, 92]]
 
         self.ssg = self.sections_coords[self.section_start_game]
         self.sr = self.sections_coords[self.section_records]
-        self.ss = self.sections_coords[self.section_shop]
+        self.sst = self.sections_coords[self.section_stats]
+        self.ssh = self.sections_coords[self.section_shop]
         self.se = self.sections_coords[self.section_exit]
 
     def main_menu(self):
         screen.blit(self.bg_main, (0, 0))
-        for i in range(4):
+        for i in range(5):
             section = self.sections[i]
             if section[1]:
                 color = self.color_chosen
@@ -313,34 +319,49 @@ class MainMenu:
                         self.sections[1][1] = True
                         self.main_menu()
 
-                    # section shop
-                    elif (self.ss[0] < event.pos[0] < self.ss[2]) and (self.ss[1] < event.pos[1] < self.ss[3]):
+                    # section stats
+                    elif (self.sst[0] < event.pos[0] < self.sst[2]) and (self.sst[1] < event.pos[1] < self.sst[3]):
                         self.clear_selection()
                         self.sections[2][1] = True
+                        self.main_menu()
+
+                    # section shop
+                    elif (self.ssh[0] < event.pos[0] < self.ssh[2]) and (self.ssh[1] < event.pos[1] < self.ssh[3]):
+                        self.clear_selection()
+                        self.sections[3][1] = True
                         self.main_menu()
 
                     # section exit
                     elif (self.se[0] < event.pos[0] < self.se[2]) and (self.se[1] < event.pos[1] < self.se[3]):
                         self.clear_selection()
-                        self.sections[3][1] = True
+                        self.sections[4][1] = True
                         self.main_menu()
                     else:
                         self.clear_selection()
                         self.main_menu()
 
                 if event.type == pg.MOUSEBUTTONDOWN:
+
                     # section start game
                     if (self.ssg[0] < event.pos[0] < self.ssg[2]) and (self.ssg[1] < event.pos[1] < self.ssg[3]) \
                         and event.button == 1:
                         return 1
+
                     # section records
                     elif (self.sr[0] < event.pos[0] < self.sr[2]) and (self.sr[1] < event.pos[1] < self.sr[3]) \
                         and event.button == 1:
                         return 2
-                    # section shop
-                    elif (self.ss[0] < event.pos[0] < self.ss[2]) and (self.ss[1] < event.pos[1] < self.ss[3]) \
+
+                    # section stats
+                    elif (self.sst[0] < event.pos[0] < self.sst[2]) and (self.sst[1] < event.pos[1] < self.sst[3]) \
                         and event.button == 1:
                         return 3
+
+                    # section shop
+                    elif (self.ssh[0] < event.pos[0] < self.ssh[2]) and (self.ssh[1] < event.pos[1] < self.ssh[3]) \
+                        and event.button == 1:
+                        return 4
+
                     # section exit
                     elif (self.se[0] < event.pos[0] < self.se[2]) and (self.se[1] < event.pos[1] < self.se[3]) \
                         and event.button == 1:
@@ -350,7 +371,7 @@ class MainMenu:
             clock.tick(FPS)
 
     def clear_selection(self):
-        for i in range(4):
+        for i in range(5):
             self.sections[i][1] = False
 
 
@@ -402,6 +423,10 @@ if __name__ == '__main__':
         pass
 
     elif section == 3:
+        game(True)
+        pass
+
+    elif section == 4:
         game(True)
         pass
 
