@@ -206,42 +206,42 @@ class MainMenu:
         self.section_start_game = "START GAME"
         self.section_records = "RECORDS"
         self.section_stats = "STATS"
-        self.section_shop = "SHOP"
+        self.section_info = "INFO"
         self.section_exit = "EXIT"
         self.sections = [[self.section_start_game, False], [self.section_records, False], [self.section_stats, False],
-                         [self.section_shop, False], [self.section_exit, False]]
+                         [self.section_info, False], [self.section_exit, False]]
         self.sections_coords = {
             self.section_start_game: (80, 119, 549, 198),
             self.section_records: (80, 219, 439, 298),
             self.section_stats: (80, 319, 311, 398),
-            self.section_shop: (80, 419, 300, 498),
+            self.section_info: (80, 419, 263, 498),
             self.section_exit: (80, 519, 269, 598)}
 
         self.text_coord = [
             [90, 129, 449, 69],
             [90, 229, 339, 69],
             [90, 329, 211, 69],
-            [90, 429, 200, 69],
+            [90, 429, 196, 69],
             [90, 529, 169, 69]]
 
         self.rect_coord = [
             [80, 119, 469, 79],
             [80, 219, 359, 79],
             [80, 319, 231, 79],
-            [80, 419, 220, 79],
+            [80, 419, 183, 79],
             [80, 519, 189, 79]]
 
         self.rect_coord_chosen = [
-            [80, 119, 561, 92],
-            [80, 219, 430, 92],
-            [80, 319, 276, 92],
-            [80, 419, 263, 92],
-            [80, 519, 224, 92]]
+            [80, 119, 561, 93],
+            [80, 219, 430, 93],
+            [80, 319, 276, 93],
+            [80, 419, 216, 93],
+            [80, 519, 224, 93]]
 
         self.ssg = self.sections_coords[self.section_start_game]
         self.sr = self.sections_coords[self.section_records]
         self.sst = self.sections_coords[self.section_stats]
-        self.ssh = self.sections_coords[self.section_shop]
+        self.si = self.sections_coords[self.section_info]
         self.se = self.sections_coords[self.section_exit]
 
     def main_menu(self):
@@ -287,7 +287,7 @@ class MainMenu:
                         self.main_menu()
 
                     # section shop
-                    elif (self.ssh[0] < event.pos[0] < self.ssh[2]) and (self.ssh[1] < event.pos[1] < self.ssh[3]):
+                    elif (self.si[0] < event.pos[0] < self.si[2]) and (self.si[1] < event.pos[1] < self.si[3]):
                         self.clear_selection()
                         self.sections[3][1] = True
                         self.main_menu()
@@ -319,7 +319,7 @@ class MainMenu:
                         return 3
 
                     # section shop
-                    elif (self.ssh[0] < event.pos[0] < self.ssh[2]) and (self.ssh[1] < event.pos[1] < self.ssh[3]) \
+                    elif (self.si[0] < event.pos[0] < self.si[2]) and (self.si[1] < event.pos[1] < self.si[3]) \
                             and event.button == 1:
                         return 4
 
