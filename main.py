@@ -1,4 +1,4 @@
-import pygame as pg
+import pygame
 
 import os
 import sys
@@ -11,18 +11,18 @@ class Bird:
         self.dead = False
         self.jump = 10
         self.fall = 2
-        self.bird_d_sp = pg.sprite.Group()
-        self.bird_j_sp = pg.sprite.Group()
-        self.bird_sp = pg.sprite.Group()
+        self.bird_d_sp = pygame.sprite.Group()
+        self.bird_j_sp = pygame.sprite.Group()
+        self.bird_sp = pygame.sprite.Group()
 
-        self.bird = pg.sprite.Sprite()
+        self.bird = pygame.sprite.Sprite()
         self.bird_img = load_image("bird.png")
         self.bird.image = self.bird_img
         self.bird.rect = self.bird.image.get_rect()
         self.bird.rect.x = 300
         self.bird.rect.y = 300
 
-        self.bird_jump = pg.sprite.Sprite()
+        self.bird_jump = pygame.sprite.Sprite()
         self.bird_jump_img = load_image("bird_jump.png")
         self.bird_jump.image = self.bird_jump_img
         self.bird_jump.rect = self.bird_jump.image.get_rect()
@@ -87,7 +87,7 @@ class Pipe:
         self.score = 0
         self.pipes_list = []
         self.pipes_list_col = []
-        self.pipes_sp = pg.sprite.Group()
+        self.pipes_sp = pygame.sprite.Group()
 
         self.create_pipes_coords()
 
@@ -101,14 +101,14 @@ class Pipe:
             self.add_pipes(x, y)
 
     def add_pipes(self, x, dl_y):
-        self.pipe_up = pg.sprite.Sprite()
+        self.pipe_up = pygame.sprite.Sprite()
         self.pipe_up_img = load_image("pipe_up.png")
         self.pipe_up.image = self.pipe_up_img
         self.pipe_up.rect = self.pipe_up.image.get_rect()
         self.pipe_up.rect.x = x
         self.pipe_up.rect.y = dl_y
 
-        self.pipe_down = pg.sprite.Sprite()
+        self.pipe_down = pygame.sprite.Sprite()
         self.pipe_down_img = load_image("pipe_down.png")
         self.pipe_down.image = self.pipe_down_img
         self.pipe_down.rect = self.pipe_down.image.get_rect()
@@ -187,9 +187,9 @@ class PipeDown:
 
 class BackGround:
     def __init__(self):
-        self.background = pg.sprite.Group()
+        self.background = pygame.sprite.Group()
 
-        self.bg = pg.sprite.Sprite()
+        self.bg = pygame.sprite.Sprite()
         self.bg.image = load_image("background.png")
         self.bg.rect = self.bg.image.get_rect()
 
@@ -198,9 +198,9 @@ class BackGround:
 
 class MainMenu:
     def __init__(self):
-        self.bg_main = pg.transform.scale(load_image('background.png'), (width, height))
-        self.font_normal = pg.font.Font(None, 100)
-        self.font_chosen = pg.font.Font(None, 120)
+        self.bg_main = pygame.transform.scale(load_image('background.png'), (width, height))
+        self.font_normal = pygame.font.Font(None, 100)
+        self.font_chosen = pygame.font.Font(None, 120)
         self.color_normal = (250, 200, 100)
         self.color_chosen = (255, 144, 0)
         self.section_start_game = "START GAME"
@@ -260,14 +260,14 @@ class MainMenu:
                 rect_coord = self.rect_coord[i]
 
             screen.blit(text, self.text_coord[i])
-            pg.draw.rect(screen, color, rect_coord, 3)
+            pygame.draw.rect(screen, color, rect_coord, 3)
 
     def choose_section(self):
         while True:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     terminate()
-                if event.type == pg.MOUSEMOTION:
+                if event.type == pygame.MOUSEMOTION:
                     # section start game
                     if (self.ssg[0] < event.pos[0] < self.ssg[2]) and (self.ssg[1] < event.pos[1] < self.ssg[3]):
                         self.clear_selection()
@@ -301,7 +301,7 @@ class MainMenu:
                         self.clear_selection()
                         self.main_menu()
 
-                if event.type == pg.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN:
 
                     # section start game
                     if (self.ssg[0] < event.pos[0] < self.ssg[2]) and (self.ssg[1] < event.pos[1] < self.ssg[3]) \
@@ -328,7 +328,7 @@ class MainMenu:
                             and event.button == 1:
                         return 5
 
-            pg.display.flip()
+            pygame.display.flip()
             clock.tick(FPS)
 
     def clear_selection(self):
@@ -338,7 +338,7 @@ class MainMenu:
 
 class EndScreen:
     def __init__(self):
-        self.font = pg.font.Font(None, 80)
+        self.font = pygame.font.Font(None, 80)
         self.color_normal = (250, 200, 100)
         self.color_chosen = (255, 144, 0)
         self.section_play_again = "PLAY AGAIN"
@@ -365,7 +365,7 @@ class EndScreen:
         self.se = self.sections_coords[self.section_exit]
 
     def end_screen(self):
-        pg.draw.rect(screen, self.color_chosen, (240, 180, 550, 390), 5)
+        pygame.draw.rect(screen, self.color_chosen, (240, 180, 550, 390), 5)
         for i in range(3):
             section = self.sections[i]
             if section[1]:
@@ -375,14 +375,15 @@ class EndScreen:
             text = self.font.render(section[0], True, color)
 
             screen.blit(text, self.text_coord[i])
-            pg.draw.rect(screen, color, self.rect_coord[i], 3)
+            pygame.draw.rect(screen, color, self.rect_coord[i], 3)
 
     def choose_section(self):
+        self.end_screen()
         while True:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     terminate()
-                if event.type == pg.MOUSEMOTION:
+                if event.type == pygame.MOUSEMOTION:
                     # section play again
                     if (self.spa[0] < event.pos[0] < self.spa[2]) and (self.spa[1] < event.pos[1] < self.spa[3]):
                         self.clear_selection()
@@ -405,7 +406,7 @@ class EndScreen:
                         self.clear_selection()
                         self.end_screen()
 
-                if event.type == pg.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN:
                     # section play again
                     if (self.spa[0] < event.pos[0] < self.spa[2]) and (self.spa[1] < event.pos[1] < self.spa[3]):
                         return 1
@@ -418,7 +419,108 @@ class EndScreen:
                     elif (self.se[0] < event.pos[0] < self.se[2]) and (self.se[1] < event.pos[1] < self.se[3]):
                         return 3
 
-            pg.display.flip()
+            pygame.display.flip()
+            clock.tick(FPS)
+
+    def clear_selection(self):
+        for i in range(3):
+            self.sections[i][1] = False
+
+
+class Pause:
+    def __init__(self):
+        self.font = pygame.font.Font(None, 80)
+        self.color_normal = (250, 200, 100)
+        self.color_chosen = (255, 144, 0)
+        self.section_resume = "RESUME GAME"
+        self.section_main_menu = "EXIT TO MENU"
+        self.section_exit = "EXIT TO DESKTOP"
+        self.sections = [[self.section_resume, False], [self.section_main_menu, False], [self.section_exit, False]]
+        self.sections_coords = {
+            self.section_resume: (292, 330, 740, 400),
+            self.section_main_menu: (302, 416, 730, 486),
+            self.section_exit: (253, 502, 776, 572)
+        }
+
+        self.text_coord = [
+            (302, 340, 422, 56),
+            (312, 426, 408, 56),
+            (263, 512, 513, 56),
+        ]
+
+        self.rect_coord = [
+            (292, 330, 448, 70),
+            (302, 416, 428, 70),
+            (253, 502, 523, 70),
+        ]
+
+        self.sr = self.sections_coords[self.section_resume]
+        self.smm = self.sections_coords[self.section_main_menu]
+        self.se = self.sections_coords[self.section_exit]
+
+    def pause(self):
+        font = pygame.font.Font(None, 100)
+        text = font.render("PAUSE", True, self.color_chosen)
+        screen.blit(text, (353, 191))
+        pygame.draw.rect(screen, self.color_chosen, (622, 191, 15, 60))
+        pygame.draw.rect(screen, self.color_chosen, (657, 191, 15, 60))
+
+        pygame.draw.rect(screen, self.color_chosen, (240, 280, 550, 350), 5)
+        for i in range(3):
+            section = self.sections[i]
+            if section[1]:
+                color = self.color_chosen
+            else:
+                color = self.color_normal
+            text = self.font.render(section[0], True, color)
+
+            screen.blit(text, self.text_coord[i])
+            pygame .draw.rect(screen, color, self.rect_coord[i], 2)
+
+    def choose_section(self):
+        self.pause()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+
+                if event.type == pygame.MOUSEMOTION:
+                    # section play again
+                    if (self.sr[0] < event.pos[0] < self.sr[2]) and (self.sr[1] < event.pos[1] < self.sr[3]):
+                        self.clear_selection()
+                        self.sections[0][1] = True
+                        self.pause()
+
+                    # section main menu
+                    elif (self.smm[0] < event.pos[0] < self.smm[2]) and (self.smm[1] < event.pos[1] < self.smm[3]):
+                        self.clear_selection()
+                        self.sections[1][1] = True
+                        self.pause()
+
+                    # section exit
+                    elif (self.se[0] < event.pos[0] < self.se[2]) and (self.se[1] < event.pos[1] < self.se[3]):
+                        self.clear_selection()
+                        self.sections[2][1] = True
+                        self.pause()
+
+                    else:
+                        self.clear_selection()
+                        self.pause()
+
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # section play again
+                    if (self.sr[0] < event.pos[0] < self.sr[2]) and (self.sr[1] < event.pos[1] < self.sr[3]):
+                        return 1
+
+                    # section main menu
+                    elif (self.smm[0] < event.pos[0] < self.smm[2]) and (self.smm[1] < event.pos[1] < self.smm[3]):
+                        return 2
+
+                    # section exit
+                    elif (self.se[0] < event.pos[0] < self.se[2]) and (self.se[1] < event.pos[1] < self.se[3]):
+                        return 3
+
+            pygame.display.flip()
             clock.tick(FPS)
 
     def clear_selection(self):
@@ -431,7 +533,7 @@ def load_image(name, colorkey=None):
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
-    image = pg.image.load(fullname)
+    image = pygame.image.load(fullname)
 
     if colorkey is not None:
         image = image.convert()
@@ -444,7 +546,7 @@ def load_image(name, colorkey=None):
 
 
 def print_score(score):
-    font = pg.font.Font(None, 86)
+    font = pygame.font.Font(None, 86)
     text = font.render(str(score), True, (252, 200, 96))
     screen.blit(text, (512, 78))
 
@@ -463,11 +565,11 @@ def draw_sprites(score, pipe, bird):
 
     print_score(score)
 
-    pg.display.flip()
+    pygame.display.flip()
 
 
 def terminate():
-    pg.quit()
+    pygame.quit()
     sys.exit()
 
 
@@ -482,18 +584,27 @@ def game():
     # Start game, waiting player
     start = False
     while not start:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pg.quit()
-            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 start = True
 
     while running:
         jump = False
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pg.quit()
-            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                section = pause.choose_section()
+                if section == 1:
+                    continue
+                if section == 2:
+                    running = False
+                    break
+                if section == 3:
+                    terminate()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 if not bird.dead:
                     jump = True
 
@@ -524,17 +635,18 @@ def game():
 
 
 if __name__ == '__main__':
-    pg.init()
+    pygame.init()
     size = width, height = 1024, 780
-    screen = pg.display.set_mode(size)
+    screen = pygame.display.set_mode(size)
 
     FPS = 15
-    clock = pg.time.Clock()
+    clock = pygame.time.Clock()
     jump = False
 
     bg = BackGround()
     main_menu = MainMenu()
     end_screen = EndScreen()
+    pause = Pause()
 
     while True:
         section = main_menu.choose_section()
